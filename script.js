@@ -1,7 +1,11 @@
 let items=JSON.parse(localStorage.getItem("wishlist_v4")||"[]");
+
+// 保存されたカテゴリ一覧を取得（初期値がなければデフォルトのいくつかを用意）
+let categories=JSON.parse(localStorage.getItem("wishlist_categories")||'["電子機器", "ファッション", "本", "その他"]');
+
 let editingId=null,deletingId=null,currentImageData="";
 
-// 前回保存された選択状態を復元（キープ機能）
+// 前回保存された選択状態を復元
 let selectedCategory = localStorage.getItem("wishlist_cat") || "all";
 document.getElementById("filterStatus").value = localStorage.getItem("wishlist_status") || "all";
 document.getElementById("sort").value = localStorage.getItem("wishlist_sort") || "manual";
@@ -16,6 +20,11 @@ const yen=n=>"¥"+Number(n||0).toLocaleString("ja-JP");
 
 function save(){
   localStorage.setItem("wishlist_v4",JSON.stringify(items));
+  render();
+}
+
+function saveCategories(){
+  localStorage.setItem("wishlist_categories",JSON.stringify(categories));
   render();
 }
 
@@ -44,7 +53,7 @@ function saveItem(){
  const data={
  name,price,
  url:document.getElementById("url").value.trim(),
- category:document.getElementById("category").value.trim()||"その他",
+ category:document.getElementById("category").value,
  memo:document.getElementById("memo").value.trim(),
  image:currentImageData,
  desire:Number(document.getElementById("desire").value),
@@ -69,7 +78,7 @@ function editItem(id){
  document.getElementById("name").value=x.name;
  document.getElementById("price").value=x.price;
  document.getElementById("url").value=x.url||"";
- document.getElementById("category").value=x.category||"";
+ document.getElementById("category").value=x.category||categories[0];
  document.getElementById("memo").value=x.memo||"";
  document.getElementById("desire").value=x.desire;
  document.getElementById("priority").value=x.priority;
@@ -85,7 +94,8 @@ function editItem(id){
 function cancelEdit(){
  editingId=null;currentImageData="";
  document.getElementById("formTitle").textContent="新しいアイテムを追加";
- ["name","price","url","category","memo","date","image"].forEach(k=>document.getElementById(k).value="");
+ ["name","price","url","memo","date","image"].forEach(k=>document.getElementById(k).value="");
+ document.getElementById("category").value=categories[0];
  document.getElementById("desire").value="3";
  document.getElementById("priority").value="medium";
  document.getElementById("status").value="wanted";
@@ -109,8 +119,49 @@ function askDelete(id){deletingId=id;document.getElementById("modal").classList.
 function closeModal(){deletingId=null;document.getElementById("modal").classList.remove("show")}
 function confirmDelete(){items=items.filter(x=>x.id!==deletingId);closeModal();save()}
 
+// カテゴリ管理モーダル制御
+function openCategoryModal(){
+ renderCategoryManageList();
+ document.getElementById("categoryModal").classList.add("show");
+}
+function closeCategoryModal(){
+ document.getElementById("categoryModal").classList.remove("show");
+}
+function addCategory(){
+ const input=document.getElementById("newCategoryName");
+ const val=input.value.trim();
+ if(!val)return;
+ if(categories.includes(val)){alert("すでに存在するカテゴリです");return;}
+ categories.push(val);
+ input.value="";
+ saveCategories();
+ renderCategoryManageList();
+}
+function deleteCategory(cat){
+ if(categories.length<=1){alert("カテゴリは最低1つ必要です");return;}
+ if(confirm(`「${cat}」を削除しますか？\n(このカテゴリのアイテムは「その他」に変更されます)`)){
+   categories=categories.filter(c=>c!==cat);
+   if(!categories.includes("other")) categories.push("その他");
+   items.forEach(x=>{if(x.category===cat)x.category="その他";});
+   if(selectedCategory===cat)selectedCategory="all";
+   save();
+   saveCategories();
+   renderCategoryManageList();
+ }
+}
+function renderCategoryManageList(){
+ const container=document.getElementById("categoryManageList");
+ container.innerHTML=categories.map(cat=>`
+   <div style="display:flex;justify-content:space-between;align-items:center;background:var(--input-bg);padding:8px 12px;border-radius:8px;border:1px solid var(--border-color);">
+     <span style="font-size:14px">${escapeHtml(cat)}</span>
+     <button onclick="deleteCategory('${escapeHtml(cat)}')" style="background:transparent;color:#ff4d4d;padding:4px 8px;font-size:12px;border:none">削除</button>
+   </div>
+ `).join("");
+}
+
 function exportData(){
- const dataStr="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(items));
+ const backup={items,categories};
+ const dataStr="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(backup));
  const downloadAnchor=document.createElement('a');
  downloadAnchor.setAttribute("href", dataStr);
  downloadAnchor.setAttribute("download", "wishlist_backup.json");
@@ -127,8 +178,17 @@ function importData(event){
    try{
      const imported=JSON.parse(e.target.result);
      if(Array.isArray(imported)){
+       // 古い形式のバックアップの場合
        if(confirm("現在のデータに上書きしますか？\n「OK」で復元を実行します。")){
          items=imported;
+         save();
+         alert("データを正常に復元しました！");
+       }
+     }else if(imported.items && Array.isArray(imported.items)){
+       if(confirm("現在のデータに上書きしますか？\n「OK」で復元を実行します。")){
+         items=imported.items;
+         if(imported.categories) categories=imported.categories;
+         saveCategories();
          save();
          alert("データを正常に復元しました！");
        }
@@ -143,11 +203,19 @@ function importData(event){
  reader.readAsText(file);
 }
 
+function renderCategorySelect(){
+ const select=document.getElementById("category");
+ const currentVal=select.value;
+ select.innerHTML=categories.map(cat=>`<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`).join("");
+ if(categories.includes(currentVal)) select.value=currentVal;
+}
+
 function renderCategoryTabs(){
+ renderCategorySelect();
  const container=document.getElementById("categoryTabs");
- const categories=["all", ...new Set(items.map(x=>x.category||"その他"))];
+ const cats=["all", ...categories];
  
- container.innerHTML=categories.map(cat=>{
+ container.innerHTML=cats.map(cat=>{
    const label=cat==="all"?"すべて":cat;
    const active=selectedCategory===cat?"active":"";
    return `<button class="cat-tab ${active}" onclick="selectCategory('${cat}')">${label}</button>`;
@@ -183,7 +251,7 @@ function render(){
  if(s==="priceAsc")arr.sort((a,b)=>a.price-b.price);
  if(s==="priceDesc")arr.sort((a,b)=>b.price-a.price);
  if(s==="date")arr.sort((a,b)=>(a.date||"9999").localeCompare(b.date||"9999"));
- if(s==="new")arr.sort((a,b)=>b.created-a.created);
+ if(s===“new”)arr.sort((a,b)=>b.created-a.created);
 
  document.getElementById("list").innerHTML=arr.length?arr.map((x,i)=>{
    const img=x.image?`<img class="thumb" src="${x.image}" alt="">`:`<div class="noimg">画像なし</div>`;
