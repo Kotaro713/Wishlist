@@ -1,4 +1,3 @@
-/* デフォルト（ライトモード）の色変数 */
 :root {
   --bg-color: #f5f6f8;
   --card-bg: #ffffff;
@@ -12,7 +11,6 @@
   --primary-text: #ffffff;
 }
 
-/* iPhone本体がダークモードのときに自動で切り替わる設定 */
 @media (prefers-color-scheme: dark) {
   :root {
     --bg-color: #121212;
@@ -44,7 +42,6 @@ button{border:0;border-radius:10px;padding:12px;cursor:pointer;font-weight:700;f
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
 .stat{background:var(--card-bg);border-radius:12px;padding:12px;box-shadow:0 2px 6px rgba(0,0,0,.03)}.stat small{color:var(--sub-text);display:block;font-size:11px}.stat strong{font-size:18px;color:var(--text-color)}
 
-/* カテゴリタブ */
 .category-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:10px;-webkit-overflow-scrolling:touch}
 .category-tabs::-webkit-scrollbar{display:none}
 .cat-tab{background:var(--btn-bg);border:1px solid var(--border-color);border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--sub-text);cursor:pointer;white-space:nowrap;flex:none}

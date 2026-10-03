@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Wishlist</title>
 
-<!-- iPhoneのホーム画面に追加したときのアイコン設定（wishlist.jpgを使用） -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Wishlist">
@@ -17,6 +16,8 @@
 <div class="wrap">
 <div class="header-flex">
   <h1>✨ Wishlist</h1>
+  <!-- カテゴリ管理を開くボタン -->
+  <button onclick="openCategoryManager()" style="background:var(--btn-bg);color:var(--text-color);font-size:12px;padding:6px 12px;border:1px solid var(--border-color);border-radius:8px;">🏷️ カテゴリ管理</button>
 </div>
 <p class="sub">欲しい物を記録して、スマートに管理。</p>
 
@@ -41,7 +42,9 @@
 <input id="url" type="url" placeholder="https://...">
 
 <label>カテゴリ</label>
-<input id="category" placeholder="例：電子機器">
+<select id="category">
+  <!-- JavaScriptで動的に生成されます -->
+</select>
 
 <label>メモ</label>
 <textarea id="memo" placeholder="色、サイズ、購入条件など"></textarea>
@@ -119,6 +122,7 @@
 </div>
 </div>
 
+<!-- 削除確認モーダル -->
 <div class="modal" id="modal">
 <div class="modalbox">
 <h3 style="margin-top:0;font-size:16px">削除しますか？</h3>
@@ -126,6 +130,23 @@
 <div class="modal-actions">
 <button onclick="closeModal()">キャンセル</button>
 <button class="buy" onclick="confirmDelete()">削除</button>
+</div>
+</div>
+</div>
+
+<!-- カテゴリ管理モーダル -->
+<div class="modal" id="categoryModal">
+<div class="modalbox">
+<h3 style="margin-top:0;font-size:16px">🏷️ カテゴリの管理</h3>
+<div style="display:flex;gap:6px;margin-bottom:12px;">
+<input id="newCategoryInput" placeholder="新しいカテゴリ名" style="font-size:14px;padding:10px;">
+<button onclick="addNewCategory()" style="background:var(--primary-bg);color:var(--primary-text);padding:10px 16px;white-space:nowrap;">追加</button>
+</div>
+<div id="categoryListContainer" style="max-height:200px;overflow-y:auto;margin-bottom:15px;display:flex;flex-direction:column;gap:6px;">
+<!-- JavaScriptでカテゴリ一覧を挿入 -->
+</div>
+<div class="modal-actions">
+<button onclick="closeCategoryManager()" style="width:100%;">閉じる</button>
 </div>
 </div>
 </div>
