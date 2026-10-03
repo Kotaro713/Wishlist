@@ -1,5 +1,5 @@
 let items=JSON.parse(localStorage.getItem("wishlist_v4")||"[]");
-let editingId=null,deletingId=null,currentImageData="";
+let editingId=null,deletingId=null,currentImageData="",selectedCategory="all";
 
 const statusLabel={
 wanted:"欲しい",considering:"検討中",planned:"購入予定",
@@ -92,7 +92,6 @@ function askDelete(id){deletingId=id;document.getElementById("modal").classList.
 function closeModal(){deletingId=null;document.getElementById("modal").classList.remove("show")}
 function confirmDelete(){items=items.filter(x=>x.id!==deletingId);closeModal();save()}
 
-// 💾 バックアップ保存（JSON書き出し）機能
 function exportData(){
  const dataStr="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(items));
  const downloadAnchor=document.createElement('a');
@@ -103,7 +102,6 @@ function exportData(){
  downloadAnchor.remove();
 }
 
-// 📂 バックアップから復元（JSON読み込み）機能
 function importData(event){
  const file=event.target.files[0];
  if(!file)return;
@@ -112,7 +110,7 @@ function importData(event){
    try{
      const imported=JSON.parse(e.target.result);
      if(Array.isArray(imported)){
-       if(confirm("現在のデータに上書き（または結合）しますか？\n「OK」で復元を実行します。")){
+       if(confirm("現在のデータに上書きしますか？\n「OK」で復元を実行します。")){
          items=imported;
          save();
          alert("データを正常に復元しました！");
@@ -123,21 +121,42 @@ function importData(event){
    }catch(err){
      alert("JSONファイルの読み込みに失敗しました。");
    }
-   event.target.value=""; // リセット
+   event.target.value="";
  };
  reader.readAsText(file);
 }
 
+// カテゴリタブを描画する関数
+function renderCategoryTabs(){
+ const container=document.getElementById("categoryTabs");
+ const categories=["all", ...new Set(items.map(x=>x.category||"その他"))];
+ 
+ container.innerHTML=categories.map(cat=>{
+   const label=cat==="all"?"すべて":cat;
+   const active=selectedCategory===cat?"active":"";
+   return `<button class="cat-tab ${active}" onclick="selectCategory('${cat}')">${label}</button>`;
+ }).join("");
+}
+
+function selectCategory(cat){
+ selectedCategory=cat;
+ render();
+}
+
 function render(){
+ renderCategoryTabs();
+
  const q=document.getElementById("search").value.toLowerCase();
  const f=document.getElementById("filterStatus").value;
  let arr=items.filter(x=>{
-   const text=(x.name+" "+x.category+" "+(x.memo||"")).toLowerCase();
-   const match=text.includes(q);
+   const cat=x.category||"その他";
+   const matchCat=selectedCategory==="all"||cat===selectedCategory;
+   const text=(x.name+" "+cat+" "+(x.memo||"")).toLowerCase();
+   const matchQuery=text.includes(q);
    let state=true;
    if(f==="active")state=x.status!=="bought"&&x.status!=="lost";
    else if(f!=="all")state=x.status===f;
-   return match&&state;
+   return matchCat&&matchQuery&&state;
  });
 
  const s=document.getElementById("sort").value;

@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ほしい物リスト</title>
+<title>Wishlist</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="wrap">
-<h1>🛒 ほしい物リスト</h1>
+<h1>✨ Wishlist</h1>
 <p class="sub">欲しい物を記録して、スマートに管理。</p>
 
 <div class="stats">
@@ -72,6 +72,9 @@
 </section>
 
 <section>
+<!-- カテゴリタブ表示エリア -->
+<div id="categoryTabs" class="category-tabs"></div>
+
 <div class="toolbar">
 <input id="search" placeholder="検索..." oninput="render()">
 <select id="filterStatus" onchange="render()">
@@ -95,7 +98,7 @@
 </select>
 </div>
 
-<!-- データ管理（バックアップ・復元）エリア -->
+<!-- データ管理エリア -->
 <div class="card" style="margin-bottom:12px; padding:12px; display:flex; gap:8px; align-items:center;">
 <button onclick="exportData()" style="flex:1; background:#eee; color:#333; font-size:12px; padding:10px;">💾 バックアップ保存</button>
 <button onclick="document.getElementById('importFile').click()" style="flex:1; background:#eee; color:#333; font-size:12px; padding:10px;">📂 復元する</button>
