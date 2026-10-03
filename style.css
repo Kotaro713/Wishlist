@@ -1,42 +1,77 @@
+/* デフォルト（ライトモード）の色変数 */
+:root {
+  --bg-color: #f5f6f8;
+  --card-bg: #ffffff;
+  --text-color: #222222;
+  --sub-text: #666666;
+  --border-color: #dddddd;
+  --input-bg: #fafafa;
+  --tag-bg: #f0f1f3;
+  --btn-bg: #eeeeee;
+  --primary-bg: #111111;
+  --primary-text: #ffffff;
+}
+
+/* iPhone本体がダークモードのときに自動で切り替わる設定 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-color: #e0e0e0;
+    --sub-text: #aaaaaa;
+    --border-color: #333333;
+    --input-bg: #2a2a2a;
+    --tag-bg: #2d2d2d;
+    --btn-bg: #2a2a2a;
+    --primary-bg: #f0f0f0;
+    --primary-text: #121212;
+  }
+}
+
 *{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:#f5f6f8;color:#222;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:var(--bg-color);color:var(--text-color);-webkit-tap-highlight-color:transparent}
 .wrap{max-width:1100px;margin:auto;padding:16px 12px 60px}
-h1{margin:0 0 4px;font-size:22px;color:#111}
-.sub{color:#666;margin:0 0 16px;font-size:13px}
+.header-flex{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+h1{margin:0;font-size:22px;color:var(--text-color)}
+.sub{color:var(--sub-text);margin:0 0 16px;font-size:13px}
 .grid{display:grid;grid-template-columns:340px 1fr;gap:18px}
-.card,.item{background:#fff;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-label{display:block;font-size:12px;font-weight:700;margin:10px 0 4px;color:#444}
-input,select,textarea{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:16px;background:#fafafa}
+.card,.item{background:var(--card-bg);border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+label{display:block;font-size:12px;font-weight:700;margin:10px 0 4px;color:var(--sub-text)}
+input,select,textarea{width:100%;padding:12px;border:1px solid var(--border-color);border-radius:10px;font-size:16px;background:var(--input-bg);color:var(--text-color)}
 textarea{resize:vertical;min-height:60px}
 button{border:0;border-radius:10px;padding:12px;cursor:pointer;font-weight:700;font-size:14px}
-.primary{width:100%;background:#111;color:#fff;margin-top:14px}
+.primary{width:100%;background:var(--primary-bg);color:var(--primary-text);margin-top:14px}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
-.stat{background:#fff;border-radius:12px;padding:12px;box-shadow:0 2px 6px rgba(0,0,0,.03)}.stat small{color:#666;display:block;font-size:11px}.stat strong{font-size:18px;color:#111}
+.stat{background:var(--card-bg);border-radius:12px;padding:12px;box-shadow:0 2px 6px rgba(0,0,0,.03)}.stat small{color:var(--sub-text);display:block;font-size:11px}.stat strong{font-size:18px;color:var(--text-color)}
 
-/* カテゴリタブのスタイル */
+/* カテゴリタブ */
 .category-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:10px;-webkit-overflow-scrolling:touch}
 .category-tabs::-webkit-scrollbar{display:none}
-.cat-tab{background:#eee;border:none;border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;color:#555;cursor:pointer;white-space:nowrap;flex:none}
-.cat-tab.active{background:#111;color:#fff}
+.cat-tab{background:var(--btn-bg);border:1px solid var(--border-color);border-radius:20px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--sub-text);cursor:pointer;white-space:nowrap;flex:none}
+.cat-tab.active{background:var(--primary-bg);color:var(--primary-text);border-color:transparent}
 
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.toolbar input{flex:1;min-width:140px;font-size:14px;padding:10px}
 .toolbar select{width:auto;min-width:110px;font-size:13px;padding:10px}
 .item{margin-bottom:10px;display:flex;gap:14px;border-left:5px solid #ccc;align-items:flex-start}
-.item.high{border-left-color:#111}.item.medium{border-left-color:#666}.item.low{border-left-color:#ccc}
+.item.high{border-left-color:#888}.item.medium{border-left-color:#aaa}.item.low{border-left-color:#ccc}
+@media (prefers-color-scheme: dark) {
+  .item.high{border-left-color:#fff}
+}
 .item.done{opacity:.6}
-.thumb{width:92px;height:92px;border-radius:11px;object-fit:cover;background:#eee;flex:none}
-.noimg{width:92px;height:92px;border-radius:11px;background:#eee;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:11px;flex:none}
-.title{font-size:17px;font-weight:800;margin-bottom:4px;word-break:break-all}
-.meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}.tag{font-size:11px;background:#f0f1f3;border-radius:6px;padding:3px 6px;color:#555}
-.price{font-size:20px;font-weight:800;white-space:nowrap;color:#111}
-.memo{margin-top:6px;color:#555;font-size:12px;word-break:break-all}
+.thumb{width:92px;height:92px;border-radius:11px;object-fit:cover;background:var(--input-bg);flex:none}
+.noimg{width:92px;height:92px;border-radius:11px;background:var(--input-bg);display:flex;align-items:center;justify-content:center;color:var(--sub-text);font-size:11px;flex:none}
+.title{font-size:17px;font-weight:800;margin-bottom:4px;word-break:break-all;color:var(--text-color)}
+.meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}.tag{font-size:11px;background:var(--tag-bg);border-radius:6px;padding:3px 6px;color:var(--sub-text)}
+.price{font-size:20px;font-weight:800;white-space:nowrap;color:var(--text-color)}
+.memo{margin-top:6px;color:var(--sub-text);font-size:12px;word-break:break-all}
 .actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end;margin-top:9px}
-.actions button{background:#eee;padding:8px 12px;font-size:12px}
-.actions .buy{background:#111;color:#fff}
-.link{display:inline-block;color:#0066cc;text-decoration:none;font-size:12px;margin-top:4px;word-break:break-all}
-.empty{text-align:center;color:#888;padding:30px 10px;font-size:14px}
+.actions button{background:var(--btn-bg);color:var(--text-color);padding:8px 12px;font-size:12px;border:1px solid var(--border-color)}
+.actions .buy{background:var(--primary-bg);color:var(--primary-text);border:none}
+.link{display:inline-block;color:#4da3ff;text-decoration:none;font-size:12px;margin-top:4px;word-break:break-all}
+.empty{text-align:center;color:var(--sub-text);padding:30px 10px;font-size:14px}
 .image-preview{display:none;max-width:100%;max-height:120px;border-radius:8px;margin-top:6px}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);align-items:center;justify-content:center;padding:15px;z-index:100}
-.modal.show{display:flex}.modalbox{background:#fff;border-radius:16px;padding:20px;width:min(400px,100%)}
-.modal-actions{display:flex;gap:8px;margin-top:15px}.modal-actions button{flex:1;padding:12px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:15px;z-index:100}
+.modal.show{display:flex}.modalbox{background:var(--card-bg);border-radius:16px;padding:20px;width:min(400px,100%)}
+.modal-actions{display:flex;gap:8px;margin-top:15px}.modal-actions button{flex:1;padding:12px;background:var(--btn-bg);color:var(--text-color);border:1px solid var(--border-color)}
+.modal-actions .buy{background:var(--primary-bg);color:var(--primary-text);border:none}
 @media(max-width:780px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.item{flex-wrap:wrap}.item>div:nth-child(2){flex:1;min-width:180px}.price{font-size:18px}}

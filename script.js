@@ -1,5 +1,11 @@
 let items=JSON.parse(localStorage.getItem("wishlist_v4")||"[]");
-let editingId=null,deletingId=null,currentImageData="",selectedCategory="all";
+let editingId=null,deletingId=null,currentImageData="";
+
+// 前回保存された選択状態を復元（キープ機能）
+let selectedCategory = localStorage.getItem("wishlist_cat") || "all";
+document.getElementById("filterStatus").value = localStorage.getItem("wishlist_status") || "all";
+document.getElementById("sort").value = localStorage.getItem("wishlist_sort") || "manual";
+document.getElementById("search").value = localStorage.getItem("wishlist_search") || "";
 
 const statusLabel={
 wanted:"欲しい",considering:"検討中",planned:"購入予定",
@@ -8,7 +14,18 @@ bought:"購入済み",hold:"保留",lost:"欲しくなくなった"
 const priorityLabel={high:"🔥 最優先",medium:"🟡 欲しい",low:"⚪ いつか欲しい"};
 const yen=n=>"¥"+Number(n||0).toLocaleString("ja-JP");
 
-function save(){localStorage.setItem("wishlist_v4",JSON.stringify(items));render()}
+function save(){
+  localStorage.setItem("wishlist_v4",JSON.stringify(items));
+  render();
+}
+
+// フィルターや検索が変わったときに状態をキープする
+function onFilterChange(){
+  localStorage.setItem("wishlist_status", document.getElementById("filterStatus").value);
+  localStorage.setItem("wishlist_sort", document.getElementById("sort").value);
+  localStorage.setItem("wishlist_search", document.getElementById("search").value);
+  render();
+}
 
 function previewImage(){
  const f=document.getElementById("image").files[0],p=document.getElementById("preview");
@@ -126,7 +143,6 @@ function importData(event){
  reader.readAsText(file);
 }
 
-// カテゴリタブを描画する関数
 function renderCategoryTabs(){
  const container=document.getElementById("categoryTabs");
  const categories=["all", ...new Set(items.map(x=>x.category||"その他"))];
@@ -140,6 +156,7 @@ function renderCategoryTabs(){
 
 function selectCategory(cat){
  selectedCategory=cat;
+ localStorage.setItem("wishlist_cat", cat);
  render();
 }
 

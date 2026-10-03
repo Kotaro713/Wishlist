@@ -8,7 +8,9 @@
 </head>
 <body>
 <div class="wrap">
-<h1>✨ Wishlist</h1>
+<div class="header-flex">
+  <h1>✨ Wishlist</h1>
+</div>
 <p class="sub">欲しい物を記録して、スマートに管理。</p>
 
 <div class="stats">
@@ -76,8 +78,8 @@
 <div id="categoryTabs" class="category-tabs"></div>
 
 <div class="toolbar">
-<input id="search" placeholder="検索..." oninput="render()">
-<select id="filterStatus" onchange="render()">
+<input id="search" placeholder="検索..." oninput="onFilterChange()">
+<select id="filterStatus" onchange="onFilterChange()">
 <option value="all">すべて</option>
 <option value="active">未購入</option>
 <option value="bought">購入済み</option>
@@ -87,7 +89,7 @@
 <option value="hold">保留</option>
 <option value="lost">欲しくなくなった</option>
 </select>
-<select id="sort" onchange="render()">
+<select id="sort" onchange="onFilterChange()">
 <option value="manual">自分の順番</option>
 <option value="priority">優先度順</option>
 <option value="desire">欲しい度順</option>
@@ -100,8 +102,8 @@
 
 <!-- データ管理エリア -->
 <div class="card" style="margin-bottom:12px; padding:12px; display:flex; gap:8px; align-items:center;">
-<button onclick="exportData()" style="flex:1; background:#eee; color:#333; font-size:12px; padding:10px;">💾 バックアップ保存</button>
-<button onclick="document.getElementById('importFile').click()" style="flex:1; background:#eee; color:#333; font-size:12px; padding:10px;">📂 復元する</button>
+<button onclick="exportData()" style="flex:1; background:var(--btn-bg); color:var(--text-color); font-size:12px; padding:10px; border:1px solid var(--border-color);">💾 バックアップ保存</button>
+<button onclick="document.getElementById('importFile').click()" style="flex:1; background:var(--btn-bg); color:var(--text-color); font-size:12px; padding:10px; border:1px solid var(--border-color);">📂 復元する</button>
 <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
 </div>
 
@@ -113,7 +115,7 @@
 <div class="modal" id="modal">
 <div class="modalbox">
 <h3 style="margin-top:0;font-size:16px">削除しますか？</h3>
-<p style="color:#666;font-size:13px">この項目は元に戻せません。</p>
+<p style="color:var(--sub-text);font-size:13px">この項目は元に戻せません。</p>
 <div class="modal-actions">
 <button onclick="closeModal()">キャンセル</button>
 <button class="buy" onclick="confirmDelete()">削除</button>
