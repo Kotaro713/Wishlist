@@ -1,5 +1,4 @@
 let items=JSON.parse(localStorage.getItem("wishlist_v4")||"[]");
-// 保存されているカスタムカテゴリ（なければデフォルトでいくつか用意）
 let categories=JSON.parse(localStorage.getItem("wishlist_categories")||'["電子機器", "ファッション", "本・雑誌", "その他"]');
 
 let editingId=null,deletingId=null,currentImageData="";
@@ -40,6 +39,26 @@ function previewImage(){
  r.onload=()=>{currentImageData=r.result;p.src=r.result;p.style.display="block"};
  r.readAsDataURL(f);
 }
+
+// 📌 【新機能】ページ上で Ctrl+V (Cmd+V) を押すと画像をペーストできるようにする
+document.addEventListener("paste", function(e){
+  const clipboardItems = (e.clipboardData || e.originalEvent.clipboardData).items;
+  for(let item of clipboardItems){
+    if(item.type.indexOf("image") === 0){
+      const blob = item.getAsFile();
+      const reader = new FileReader();
+      reader.onload = function(event){
+        currentImageData = event.target.result;
+        const p = document.getElementById("preview");
+        p.src = currentImageData;
+        p.style.display = "block";
+      };
+      reader.readAsDataURL(blob);
+      e.preventDefault(); // デフォルトのペースト挙動を防ぐ
+      break;
+    }
+  }
+});
 
 function saveItem(){
  const name=document.getElementById("name").value.trim();
@@ -116,7 +135,6 @@ function askDelete(id){deletingId=id;document.getElementById("modal").classList.
 function closeModal(){deletingId=null;document.getElementById("modal").classList.remove("show")}
 function confirmDelete(){items=items.filter(x=>x.id!==deletingId);closeModal();save()}
 
-// カテゴリ管理モーダルの制御
 function openCategoryManager(){
  document.getElementById("categoryModal").classList.add("show");
  renderCategoryManagerList();
@@ -149,7 +167,6 @@ function addNewCategory(){
 function deleteCategory(idx){
  const target = categories[idx];
  if(confirm(`「${target}」を削除しますか？\n※このカテゴリを使っているアイテムは「その他」に変更されます。`)){
-   // 該当カテゴリを使っているアイテムを「その他」に変更
    items.forEach(x=>{
      if(x.category === target) x.category = "その他";
    });
@@ -183,7 +200,6 @@ function importData(event){
  reader.onload=function(e){
    try{
      const imported=JSON.parse(e.target.result);
-     // 新旧どちらのフォーマット（配列直下、またはオブジェクト）にも対応
      const loadedItems = Array.isArray(imported) ? imported : imported.items;
      const loadedCats = imported.categories;
 
@@ -246,7 +262,7 @@ function render(){
  if(s==="manual")arr.sort((a,b)=>(a.order??0)-(b.order??0));
  if(s==="priority"){const p={high:0,medium:1,low:2};arr.sort((a,b)=>p[a.priority]-p[b.priority]||b.desire-a.desire)}
  if(s==="desire")arr.sort((a,b)=>b.desire-a.desire);
- if(s==="priceAsc")arr.sort((a,b)=>a.price-b.price);
+ if(s== "priceAsc")arr.sort((a,b)=>a.price-b.price);
  if(s==="priceDesc")arr.sort((a,b)=>b.price-a.price);
  if(s==="date")arr.sort((a,b)=>(a.date||"9999").localeCompare(b.date||"9999"));
  if(s==="new")arr.sort((a,b)=>b.created-a.created);
