@@ -92,6 +92,42 @@ function askDelete(id){deletingId=id;document.getElementById("modal").classList.
 function closeModal(){deletingId=null;document.getElementById("modal").classList.remove("show")}
 function confirmDelete(){items=items.filter(x=>x.id!==deletingId);closeModal();save()}
 
+// 💾 バックアップ保存（JSON書き出し）機能
+function exportData(){
+ const dataStr="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(items));
+ const downloadAnchor=document.createElement('a');
+ downloadAnchor.setAttribute("href", dataStr);
+ downloadAnchor.setAttribute("download", "wishlist_backup.json");
+ document.body.appendChild(downloadAnchor);
+ downloadAnchor.click();
+ downloadAnchor.remove();
+}
+
+// 📂 バックアップから復元（JSON読み込み）機能
+function importData(event){
+ const file=event.target.files[0];
+ if(!file)return;
+ const reader=new FileReader();
+ reader.onload=function(e){
+   try{
+     const imported=JSON.parse(e.target.result);
+     if(Array.isArray(imported)){
+       if(confirm("現在のデータに上書き（または結合）しますか？\n「OK」で復元を実行します。")){
+         items=imported;
+         save();
+         alert("データを正常に復元しました！");
+       }
+     }else{
+       alert("ファイル形式が正しくありません。");
+     }
+   }catch(err){
+     alert("JSONファイルの読み込みに失敗しました。");
+   }
+   event.target.value=""; // リセット
+ };
+ reader.readAsText(file);
+}
+
 function render(){
  const q=document.getElementById("search").value.toLowerCase();
  const f=document.getElementById("filterStatus").value;
