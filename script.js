@@ -40,11 +40,11 @@ function previewImage(){
  r.readAsDataURL(f);
 }
 
-// 📌 【新機能】ページ上で Ctrl+V (Cmd+V) を押すと画像をペーストできるようにする
-document.addEventListener("paste", function(e){
-  const clipboardItems = (e.clipboardData || e.originalEvent.clipboardData).items;
-  for(let item of clipboardItems){
-    if(item.type.indexOf("image") === 0){
+// 📌 スマホの専用ペーストボックス用ハンドラー
+function handlePaste(e){
+  const itemsList = (e.clipboardData || e.originalEvent.clipboardData).items;
+  for(let item of itemsList){
+    if(item.type.indexOf("image") !== -1){
       const blob = item.getAsFile();
       const reader = new FileReader();
       reader.onload = function(event){
@@ -52,9 +52,32 @@ document.addEventListener("paste", function(e){
         const p = document.getElementById("preview");
         p.src = currentImageData;
         p.style.display = "block";
+        document.getElementById("pasteArea").innerHTML = "✅ 画像を読み込みました！";
       };
       reader.readAsDataURL(blob);
-      e.preventDefault(); // デフォルトのペースト挙動を防ぐ
+      e.preventDefault();
+      break;
+    }
+  }
+}
+
+// 📌 画面のどこでもペーストできるようにフォールバックも維持
+window.addEventListener("paste", function(e){
+  const itemsList = (e.clipboardData || e.originalEvent.clipboardData).items;
+  for(let item of itemsList){
+    if(item.type.indexOf("image") !== -1){
+      const blob = item.getAsFile();
+      const reader = new FileReader();
+      reader.onload = function(event){
+        currentImageData = event.target.result;
+        const p = document.getElementById("preview");
+        p.src = currentImageData;
+        p.style.display = "block";
+        const pasteArea = document.getElementById("pasteArea");
+        if(pasteArea) pasteArea.innerHTML = "✅ 画像を読み込みました！";
+      };
+      reader.readAsDataURL(blob);
+      e.preventDefault();
       break;
     }
   }
@@ -102,6 +125,8 @@ function editItem(id){
  document.getElementById("date").value=x.date||"";
  const p=document.getElementById("preview");
  if(x.image){p.src=x.image;p.style.display="block"}else p.style.display="none";
+ const pasteArea = document.getElementById("pasteArea");
+ if(x.image && pasteArea) pasteArea.innerHTML = "✅ 画像が設定されています（変更するには再ペースト）";
  document.querySelector(".primary").textContent="変更を保存";
  document.getElementById("cancel").style.display="block";
  window.scrollTo({top:0,behavior:"smooth"});
@@ -116,6 +141,8 @@ function cancelEdit(){
  document.getElementById("priority").value="medium";
  document.getElementById("status").value="wanted";
  document.getElementById("preview").style.display="none";
+ const pasteArea = document.getElementById("pasteArea");
+ if(pasteArea) pasteArea.innerHTML = '📋 ここをタップして画像を貼り付け（ペースト）<br><span style="font-size:11px;">または下のファイル選択から選ぶこともできます</span>';
  document.querySelector(".primary").textContent="追加する";
  document.getElementById("cancel").style.display="none";
 }
@@ -262,7 +289,7 @@ function render(){
  if(s==="manual")arr.sort((a,b)=>(a.order??0)-(b.order??0));
  if(s==="priority"){const p={high:0,medium:1,low:2};arr.sort((a,b)=>p[a.priority]-p[b.priority]||b.desire-a.desire)}
  if(s==="desire")arr.sort((a,b)=>b.desire-a.desire);
- if(s== "priceAsc")arr.sort((a,b)=>a.price-b.price);
+ if(s==="priceAsc")arr.sort((a,b)=>a.price-b.price);
  if(s==="priceDesc")arr.sort((a,b)=>b.price-a.price);
  if(s==="date")arr.sort((a,b)=>(a.date||"9999").localeCompare(b.date||"9999"));
  if(s==="new")arr.sort((a,b)=>b.created-a.created);
